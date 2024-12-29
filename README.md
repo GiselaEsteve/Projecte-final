@@ -1,7 +1,11 @@
 # Projecte-final
 Detector de Phishing en Correus Electrònics
-Descripció
-Aquest projecte consisteix en una aplicació creada en Python que permet detectar correus electrònics sospitosos de phishing. Utilitzant la biblioteca tkinter per a la creació d'una interfície gràfica, l'usuari pot introduir informació sobre un correu electrònic (remitent, assumpte, cos del correu i arxius adjunts) i l'aplicació realitza un anàlisi per determinar si el correu pot ser legítim o sospitós de phishing.
+
+1. Descripció
+  Aquest projecte consisteix en una aplicació creada en Python que permet detectar correus electrònics sospitosos de         
+  phishing. Utilitzant la biblioteca tkinter per a la creació d'una interfície gràfica, l'usuari pot introduir informació 
+  sobre un correu electrònic (remitent, assumpte, cos del correu i arxius adjunts) i l'aplicació realitza un anàlisi per 
+  determinar si el correu pot ser legítim o sospitós de phishing.
 
 El sistema realitza diverses comprovacions, incloent:
 

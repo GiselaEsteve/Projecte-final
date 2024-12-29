@@ -1,0 +1,244 @@
+import tkinter as tk
+from tkinter import messagebox
+from tkinter import ttk
+import re
+
+
+# Funciones de análisis
+def analizar_remitente(remitente):
+    """Analiza el dominio del remitente para verificar si es legítimo o sospechoso."""
+    dominio = remitente.split('@')[-1]
+    dominios_sospechosos = [
+        'example.com', 'fakesite.com', 'phishingdomain.com', 'fraudsite.net',
+        'scamsite.org', 'malicious.com', 'untrusted.com', 'spamdomain.xyz',
+        'suspiciousdomain.biz', 'unknownsource.co', 'scamemail.com', 'spammer.net',
+        'suspiciousmail.org', 'dangerousdomain.com', 'fakemail.org', 'unsafeemail.co',
+        'fakemailservice.net', 'phishingemail.co', 'virusdomain.com', 'malware.net',
+        'scamalert.com', 'fraudulentdomain.com', 'dangerouslink.com', 'phishingmail.xyz',
+        'scamphishing.com', 'fakeoffer.net', 'fraudlink.org', 'dangeroussite.co',
+        'unsecurelink.com', 'bademailservice.com', 'unsecuredemail.net', 'fraudservice.org',
+        'scamwebsite.com', 'phishingservice.net', 'junkdomain.org', 'malwaresite.biz',
+        'scammyemail.com', 'suspiciousmail.net', 'fakecompany.biz', 'unsafe-domain.com',
+        'spamemail.net', 'fraudulentservice.org', 'insecure-email.com', 'phishingalerts.org',
+        'virusmail.com', 'scamdomain.co', 'badphishing.net', 'fakeaccount.com', 'maliciouslink.org',
+        'scamdomain.info'
+    ]
+    dominios_legitimos = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com']
+
+
+    if dominio in dominios_sospechosos:
+        return "Sospechoso"
+    elif dominio in dominios_legitimos:
+        return "Seguro"
+    else:
+        return "Desconocido"
+
+
+def es_email_valido(email):
+    """Valida si un correo tiene el formato correcto."""
+    patron = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return bool(re.match(patron, email))
+
+
+def analizar_asunto(asunto):
+    """Analiza el asunto para encontrar palabras sospechosas."""
+    palabras_sospechosas = [
+        'Urgente', 'Exclusivo', 'Oferta', 'Confirmación', 'Seguridad', 'Premio',
+        'Actualización', 'Verificación', 'Aceptar ahora', 'Paga ahora', 'Reclamar',
+        'Accede aquí', 'Beneficio', 'Activar cuenta', 'Reclama tu premio', 'No esperes más',
+        'Confirmar información', 'Ganaste', 'Regalo gratis', 'Límite de tiempo',
+        'Oferta especial', 'Cuidado con tu cuenta', 'Ingreso rápido', 'Reclamo urgente',    
+        'Enlace seguro', 'Datos sensibles', 'Enlace encriptado', 'Verifica tu cuenta',
+        'No lo dejes pasar', 'Cambia tu contraseña', 'Notificación urgente', 'Haz clic aquí',
+        'Actúa ahora', 'Cambia tus datos', 'Recupera tu cuenta', 'Estás en riesgo', 'Contacto inmediato',
+        'Oferta limitada', 'Respuesta rápida', 'Información privilegiada', 'Acción requerida',
+        'No lo ignores', 'Oferta exclusiva', 'Notificación importante', 'Cierra tu cuenta',
+        'Mensaje urgente', 'Código de seguridad', 'No pierdas esta oportunidad', 'Cambia tu información ahora'
+    ]
+    palabras_detectadas = [palabra for palabra in palabras_sospechosas if re.search(palabra, asunto, re.IGNORECASE)]
+    if palabras_detectadas:
+        return f"Sospechoso: {', '.join(palabras_detectadas)}"
+    return "Seguro"
+
+
+def verificar_enlaces(cuerpo_email):
+    """Verifica si el cuerpo del email contiene enlaces sospechosos."""
+    enlaces_sospechosos = [
+        'fakesite.com', 'malicious.com', 'example.com', 'phishingsite.org',
+        'dangerouslink.net', 'fakeoffer.com', 'untrustedsitexyz.com', 'suspicious-link.biz',
+        'phishing-link.net', 'fraudulent-link.com', 'unsafe-site.xyz', 'viruslink.com',
+        'scamlink.org', 'fake-phishing.net', 'malwaresite.com', 'fakeemailservice.org',
+        'scamoffer.com', 'phishingdomain.xyz', 'dangerous-email.net', 'fraudweb.com',
+        'suspiciouslink.com', 'scamsite.biz', 'dangerouslink.co', 'malicious-redirect.com',
+        'phishingscam.org', 'fraudulentlink.net', 'dangerousdomain.xyz', 'virusdownload.net',
+        'unsafeoffer.com', 'fakepromo.biz', 'maliciousdomain.org', 'spamoffer.com',
+        'securefilelink.net', 'phishingsite.com', 'unsafeemail.co', 'scamwebsite.org',
+        'dangerousweb.net', 'unsafe-click.com', 'phishingdata.com', 'fakefiledownload.net',
+        'trojanlink.com', 'spammingsite.xyz', 'dangerousredirect.org', 'phishingtool.com',
+        'fakeemail.net', 'fakebanksite.com', 'unsafeoffer.net', 'malwarelink.com',
+        'fraudservice.net', 'unsafeattachment.com', 'phishingattack.org', 'maliciouslink.com',
+        'scamcontent.biz', 'unsafe-filelink.com'
+    ]
+    enlaces_encontrados = re.findall(r'(https?://\S+)', cuerpo_email)
+    enlaces_detectados = [enlace for enlace in enlaces_encontrados if any(dominio in enlace for dominio in enlaces_sospechosos)]
+    if enlaces_detectados:
+        return f"Sospechoso: {', '.join(enlaces_detectados)}"
+    return "Seguro"
+
+
+def comprobar_adjuntos(adjuntos):
+    """Verifica si los archivos adjuntos tienen extensiones peligrosas."""
+    extensiones_peligrosas = [
+        '.exe', '.vbs', '.bat', '.scr', '.js', '.pif', '.com', '.dll',
+        '.wsf', '.jse', '.msi', '.apk', '.sh', '.cmd', '.jar', '.zip',
+        '.tar', '.gzip', '.rar', '.7z', '.iso', '.img', '.dmg', '.tar.gz',
+        '.tar.bz2', '.xz', '.cab', '.vbe', '.wscr', '.jse', '.ps1', '.psm1',
+        '.rb', '.py', '.html', '.htm', '.php', '.sql', '.xhtml', '.pdf'
+    ]
+    archivos_peligrosos = [archivo for archivo in adjuntos if any(archivo.endswith(ext) for ext in extensiones_peligrosas)]
+    if archivos_peligrosos:
+        return f"Sospechoso: {', '.join(archivos_peligrosos)}"
+    return "Seguro"
+
+
+def guardar_resultados(remitente, asunto, enlaces, adjuntos):
+    """Guarda los resultados en un archivo txt"""
+    ruta = "/ruta/a/tu/directorio/resultados_analisis.txt"
+    with open("resultados_analisis.txt", "w") as archivo:
+        archivo.write(f"Remitente: {remitente}\n")
+        archivo.write(f"Asunto: {asunto}\n")
+        archivo.write(f"Enlaces: {enlaces}\n")
+        archivo.write(f"Adjuntos: {adjuntos}\n")
+
+
+def limpiar_campos():
+    """Limpia todos los campos de entrada y resultados."""
+    entry_remitente.delete(0, tk.END)
+    entry_asunto.delete(0, tk.END)
+    text_cuerpo.delete(1.0, tk.END)
+    entry_adjuntos.delete(0, tk.END)
+    text_resultados.config(state=tk.NORMAL)
+    text_resultados.delete(1.0, tk.END)
+    text_resultados.config(state=tk.DISABLED)
+
+
+def analizar_correo():
+    """Función que recoge los datos y muestra los resultados del análisis"""
+    remitente = entry_remitente.get()
+    asunto = entry_asunto.get()
+    cuerpo = text_cuerpo.get("1.0", "end-1c")
+    adjuntos = entry_adjuntos.get()
+
+
+    if not remitente or not asunto or not cuerpo:
+        messagebox.showerror("Error", "Por favor, completa todos los campos.")
+        return
+
+
+    if not es_email_valido(remitente):
+        messagebox.showerror("Error", "El remitente no es un correo válido.")
+        return
+
+
+    resultado_remitente = analizar_remitente(remitente)
+    resultado_asunto = analizar_asunto(asunto)
+    resultado_enlaces = verificar_enlaces(cuerpo)
+    resultado_adjuntos = comprobar_adjuntos(adjuntos.split(','))
+
+
+    resultado_texto = f"Remitente: {resultado_remitente}\n"
+    resultado_texto += f"Asunto: {resultado_asunto}\n"
+    resultado_texto += f"Enlaces: {resultado_enlaces}\n"
+    resultado_texto += f"Adjuntos: {resultado_adjuntos}"
+
+
+    # Guardar los resultados en un archivo de texto
+    guardar_resultados(resultado_remitente, resultado_asunto, resultado_enlaces, resultado_adjuntos)
+
+
+    text_resultados.config(state=tk.NORMAL)
+    text_resultados.delete(1.0, tk.END)
+    text_resultados.insert(tk.END, resultado_texto)
+    text_resultados.config(state=tk.DISABLED)
+
+
+root = tk.Tk()
+root.title("Detector de phishing en un Correo Electrónico")
+root.geometry("700x700")
+root.configure(bg='#E3F2FD')
+
+
+style = ttk.Style()
+style.configure("TButton", font=('Arial', 12), padding=5, relief="raised")
+style.configure("TLabel", background='#F7F9FC', font=('Arial', 10))
+style.configure("TEntry", font=('Arial', 10))
+
+
+style.configure("Red.TButton", background="#FF6347", foreground="black", font=('Arial', 12), padding=5)
+style.map("Red.TButton", background=[("active", "#FF4500")])
+
+
+style.configure("Yellow.TButton", background="#FFD700", foreground="black", font=('Arial', 12), padding=5)
+style.map("Yellow.TButton", background=[("active", "#FFC107")])
+
+
+frame_formulario = tk.Frame(root, bg='#F7F9FC', bd=2, relief="groove")
+frame_formulario.pack(pady=20, padx=20, fill=tk.BOTH, expand=True)
+
+
+label_remitente = tk.Label(frame_formulario, text="Remitente (Correo Electrónico):", bg='#F7F9FC', font=('Arial', 10))
+label_remitente.grid(row=0, column=0, sticky="w", padx=10, pady=5)
+
+
+entry_remitente = ttk.Entry(frame_formulario, width=50)
+entry_remitente.grid(row=0, column=1, padx=10, pady=5)
+
+
+label_asunto = tk.Label(frame_formulario, text="Asunto del Correo:", bg='#F7F9FC', font=('Arial', 10))
+label_asunto.grid(row=1, column=0, sticky="w", padx=10, pady=5)
+
+
+entry_asunto = ttk.Entry(frame_formulario, width=50)
+entry_asunto.grid(row=1, column=1, padx=10, pady=5)
+
+
+label_cuerpo = tk.Label(frame_formulario, text="Cuerpo del Correo:", bg='#F7F9FC', font=('Arial', 10))
+label_cuerpo.grid(row=2, column=0, sticky="w", padx=10, pady=5)
+
+
+text_cuerpo = tk.Text(frame_formulario, width=50, height=10, relief="solid", wrap=tk.WORD, bg='#FAFBFC', font=('Arial', 10))
+text_cuerpo.grid(row=2, column=1, padx=10, pady=5)
+
+
+label_adjuntos = tk.Label(frame_formulario, text="Archivos Adjuntos (separados por comas):", bg='#F7F9FC', font=('Arial', 10))
+label_adjuntos.grid(row=3, column=0, sticky="w", padx=10, pady=5)
+
+
+entry_adjuntos = ttk.Entry(frame_formulario, width=50)
+entry_adjuntos.grid(row=3, column=1, padx=10, pady=5)
+
+
+frame_botones = tk.Frame(root, bg='#E3F2FD')
+frame_botones.pack(pady=10)
+
+
+boton_analizar = ttk.Button(frame_botones, text="Analizar Correo", command=analizar_correo, style="Red.TButton")
+boton_analizar.grid(row=0, column=0, padx=10, pady=5)
+
+
+boton_limpiar = ttk.Button(frame_botones, text="Limpiar", command=limpiar_campos, style="Yellow.TButton")
+boton_limpiar.grid(row=0, column=1, padx=10, pady=5)
+
+
+frame_resultados = tk.Frame(root, bg='#F7F9FC', bd=2, relief="groove")
+frame_resultados.pack(pady=20, padx=20, fill=tk.BOTH, expand=True)
+
+
+label_resultados = tk.Label(frame_resultados, text="Resultados del Análisis:", bg='#F7F9FC', font=('Arial', 10))
+label_resultados.grid(row=0, column=0, sticky="w", padx=10, pady=5)
+		
+text_resultados = tk.Text(frame_resultados, width=60, height=10, relief="solid", bg='#FAFBFC', state=tk.DISABLED, font=('Arial', 10))
+text_resultados.grid(row=1, column=0, padx=10, pady=5)
+
+
+root.mainloop()
